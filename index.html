@@ -1,1 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MVC Flow Showcase - New Footwear & Rice Merchants</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
+    background: #f9f9f9;
+    color: #333;
+  }
+  header {
+    background: #005f73;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+  }
+  nav {
+    background: #0a9396;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: #94d2bd;
+    border: none;
+    margin: 5px 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #005f73;
+    transition: background 0.3s;
+  }
+  nav button:hover {
+    background: #ee9b00;
+    color: white;
+  }
+  main {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px 40px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #ccc;
+  }
+  section {
+    display: none;
+    padding: 20px 0;
+  }
+  section.active {
+    display: block;
+  }
+  h2 {
+    color: #005f73;
+    margin-bottom: 10px;
+  }
+  .product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .product-card {
+    flex: 1 1 200px;
+    background: #e0fbfc;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px #ccc;
+    transition: transform 0.2s;
+  }
+  .product-card:hover {
+    transform: scale(1.05);
+    background: #98c1d9;
+  }
+  .product-card h3 {
+    margin: 0 0 5px;
+  }
+  .btn {
+    background: #ee6c4d;
+    border: none;
+    padding: 8px 16px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .btn:hover {
+    background: #d64933;
+  }
+  .cart-item {
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .input-qty {
+    width: 50px;
+    padding: 5px;
+  }
+  label {
+    font-weight: bold;
+  }
+  input, select {
+    width: 100%;
+    padding: 7px;
+    margin: 6px 0 15px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  form {
+    max-width: 400px;
+  }
+  .message {
+    color: green;
+    font-weight: bold;
+  }
+  @media(max-width:600px){
+    nav button {
+      flex: 1 1 100%;
+      margin: 5px 0;
+    }
+    .product-grid {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>New Footwear & Rice Merchants - MVC Flow Demo</h1>
+</header>
+
+<nav>
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('products')">Products</button>
+  <button onclick="showSection('productDetail')">Product Detail</button>
+  <button onclick="showSection('cart')">Cart</button>
+  <button onclick="showSection('checkout')">Checkout</button>
+  <button onclick="showSection('login')">Login/Register</button>
+  <button onclick="showSection('admin')">Admin Panel</button>
+</nav>
+
+<main>
+  <!-- Home Section -->
+  <section id="home" class="active">
+    <h2>Home Page</h2>
+    <p>Welcome to New Footwear & Rice Merchants! Use the navigation above to explore our site.</p>
+    <p>Featured Categories:</p>
+    <ul>
+      <li><button class="btn" onclick="showSection('products', 'Footwear')">Footwear</button></li>
+      <li><button class="btn" onclick="showSection('products', 'Rice')">Rice</button></li>
+    </ul>
+  </section>
+
+  <!-- Products Section -->
+  <section id="products">
+    <h2>Products Page</h2>
+    <p>Category: <span id="product-category"></span></p>
+    <div id="product-grid" class="product-grid"></div>
+    <button class="btn" onclick="showSection('home')">Back to Home</button>
+  </section>
+
+  <!-- Product Detail Section -->
+  <section id="productDetail">
+    <h2>Product Detail</h2>
+    <div id="product-detail-content"></div>
+    <button class="btn" onclick="showSection('products')">Back to Products</button>
+  </section>
+
+  <!-- Cart Section -->
+  <section id="cart">
+    <h2>Shopping Cart</h2>
+    <div id="cart-items"></div>
+    <p><strong>Total:</strong> $<span id="cart-total">0.00</span></p>
+    <button class="btn" onclick="showSection('checkout')">Proceed to Checkout</button>
+    <button class="btn" onclick="clearCart()">Clear Cart</button>
+  </section>
+
+  <!-- Checkout Section -->
+  <section id="checkout">
+    <h2>Checkout</h2>
+    <form id="checkout-form">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required />
+      <label for="address">Shipping Address</label>
+      <input type="text" id="address" required />
+      <label for="payment">Payment Method</label>
+      <select id="payment" required>
+        <option value="">--Select--</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Paypal">Paypal</option>
+      </select>
+      <button type="submit" class="btn">Submit Order</button>
+    </form>
+    <div id="checkout-message" class="message"></div>
+  </section>
+
+  <!-- Login/Register Section -->
+  <section id="login">
+    <h2>Login / Register</h2>
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <div id="login-message" class="message"></div>
+  </section>
+
+  <!-- Admin Panel Section -->
+  <section id="admin">
+    <h2>Admin Panel (Basic Demo)</h2>
+    <p>Manage Products</p>
+    <form id="admin-add-product-form">
+      <label for="admin-product-name">Product Name</label>
+      <input type="text" id="admin-product-name" required />
+      <label for="admin-product-category">Category</label>
+      <select id="admin-product-category" required>
+        <option value="">--Select--</option>
+        <option value="Footwear">Footwear</option>
+        <option value="Rice">Rice</option>
+      </select>
+      <label for="admin-product-price">Price (USD)</label>
+      <input type="number" id="admin-product-price" min="0" step="0.01" required />
+      <button type="submit" class="btn">Add Product</button>
+    </form>
+    <h3>Current Products</h3>
+    <ul id="admin-product-list"></ul>
+  </section>
+</main>
+
+<script>
+  // Sample product data simulating backend JSON
+  const productsDB = [
+    { id: 1, category: 'Footwear', name: 'Bata Running Shoes', price: 59.99, description: 'Comfortable running shoes by Bata.' },
+    { id: 2, category: 'Footwear', name: 'Adidas Sneakers', price: 89.99, description: 'Stylish Adidas sneakers.' },
+    { id: 3, category: 'Rice', name: 'Basmati Rice 5kg', price: 20.99, description: 'Fragrant basmati rice.' },
+    { id: 4, category: 'Rice', name: 'Sona Masoori Rice 5kg', price: 18.99, description: 'Popular Indian rice variety.' }
+  ];
+
+  // Simulate a logged-in user (for demo)
+  let loggedInUser = null;
+
+  // Cart data stored here
+  let cart = [];
+
+  // Show one section only, optionally set category or product
+  function showSection(sectionId, category = null, productId = null) {
+    document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+
+    if(sectionId === 'products') {
+      displayProducts(category);
+    } else if(sectionId === 'productDetail') {
+      displayProductDetail(productId);
+    } else if(sectionId === 'cart') {
+      displayCart();
+    } else if(sectionId === 'checkout') {
+      resetCheckout();
+    } else if(sectionId === 'login') {
+      resetLogin();
+    } else if(sectionId === 'admin') {
+      displayAdminProducts();
+    }
+  }
+
+  // Show products filtered by category
+  function displayProducts(category) {
+    document.getElementById('product-category').innerText = category || 'All';
+    const grid = document.getElementById('product-grid');
+    grid.innerHTML = '';
+    let filtered = productsDB.filter(p => category ? p.category === category : true);
+    filtered.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <h3>${product.name}</h3>
+        <p>$${product.price.toFixed(2)}</p>
+        <button class="btn" onclick="showSection('productDetail', null, ${product.id})">View Details</button>
+        <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // Show product details
+  function displayProductDetail(productId) {
+    const product = productsDB.find(p => p.id === productId);
+    const container = document.getElementById('product-detail-content');
+    if(!product) {
+      container.innerHTML = '<p>Product not found.</p>';
+      return;
+    }
+    container.innerHTML = `
+      <h3>${product.name}</h3>
+      <p>Category: ${product.category}</p>
+      <p>Price: $${product.price.toFixed(2)}</p>
+      <p>${product.description}</p>
+      <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+      <button class="btn" onclick="showSection('products', '${product.category}')">Back to Products</button>
+    `;
+  }
+
+  // Add product to cart
+  function addToCart(productId) {
+    const product = productsDB.find(p => p.id === productId);
+    if(!product) return alert('Product not found');
+    const cartItem = cart.find(item => item.id === productId);
+    if(cartItem) {
+      cartItem.qty++;
+    } else {
+      cart.push({ ...product, qty: 1 });
+    }
+    alert(`${product.name} added to cart.`);
+  }
+
+  // Display cart items
+  function displayCart() {
+    const container = document.getElementById('cart-items');
+    container.innerHTML = '';
+    if(cart.length === 0) {
+      container.innerHTML = '<p>Your cart is empty.</p>';
+      document.getElementById('cart-total').innerText = '0.00';
+      return;
+    }
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.qty;
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <span>${item.name} (x${item.qty})</span>
+        <span>$${(item.price * item.qty).toFixed(2)}</span>
+        <button onclick="removeFromCart(${item.id})" class="btn" style="background:#bb3e03">Remove</button>
+      `;
+      container.appendChild(div);
+    });
+    document.getElementById('cart-total').innerText = total.toFixed(2);
+  }
+
+  // Remove item from cart
+  function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    displayCart();
+  }
+
+  // Clear cart
+  function clearCart() {
+    if(confirm('Clear all items from the cart?')) {
+      cart = [];
+      displayCart();
+    }
+  }
+
+  // Reset checkout form and message
+  function resetCheckout() {
+    document.getElementById('checkout-form').reset();
+    document.getElementById('checkout-message').innerText = '';
+  }
+
+  // Handle checkout submission
+  document.getElementById('checkout-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+    const name = document.getElementById('name').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const payment = document.getElementById('payment').value;
+
+    if(!name || !address || !payment) {
+      alert('Please fill all fields.');
+      return;
+    }
+
+    // For demo, just show success message
+    document.getElementById('checkout-message').innerText = `Thank you, ${name}! Your order has been received and will be shipped to ${address}. Payment method: ${payment}.`;
+    cart = [];
+    displayCart();
+  });
+
+  // Reset login form and message
+  function resetLogin() {
+    document.getElementById('login-form').reset();
+    document.getElementById('login-message').innerText = '';
+  }
+
+  // Handle login form submission
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if(username === '' || password === '') {
+      alert('Please fill username and password.');
+      return;
+    }
+
+    // Demo: simple hardcoded check
+    if(username === 'admin' && password === 'admin123') {
+      loggedInUser = { username: 'admin', role: 'admin' };
+      document.getElementById('login-message').innerText = 'Login successful as Admin.';
+      showSection('admin');
+    } else {
+      document.getElementById('login-message').innerText = 'Invalid credentials. Try "admin" / "admin123".';
+    }
+  });
+
+  // Display admin products in a list
+  function displayAdminProducts() {
+    const list = document.getElementById('admin-product-list');
+    list.innerHTML = '';
+    productsDB.forEach(prod => {
+      const li = document.createElement('li');
+      li.textContent = `${prod.name} (${prod.category}) - $${prod.price.toFixed(2)}`;
+      list.appendChild(li);
+    });
+  }
+
+  // Handle admin add product form
+  document.getElementById('admin-add-product-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('admin-product-name').value.trim();
+    const category = document.getElementById('admin-product-category').value;
+    const price = parseFloat(document.getElementById('admin-product-price').value);
+
+    if(!name || !category || isNaN(price) || price < 0) {
+      alert('Please fill valid product info.');
+      return;
+    }
+
+    // Add new product to DB array (demo only, no backend)
+    const newId = productsDB.length ? Math.max(...productsDB.map(p => p.id)) + 1 : 1;
+    productsDB.push({ id: newId, category, name, price, description: 'No description yet.' });
+    alert(`Product "${name}" added.`);
+    displayAdminProducts();
+    this.reset();
+  });
+
+</script>
+</body>
+</html>
 
