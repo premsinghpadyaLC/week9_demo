@@ -37,42 +37,53 @@ header {
 }
 
 /* Navigation bar */
-nav {
-  background: #023e8a;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 12px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+.nav-header {
+  display: none;
+  width: 100%;
+  text-align: right;
+  padding: 10px 20px;
 }
 
-nav button {
-  background: #48cae4;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-weight: 600;
-  color: #03045e;
-  font-size: 1rem;
+.hamburger {
+  font-size: 1.8rem;
+  color: white;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  flex-shrink: 0;
   user-select: none;
 }
 
-nav button:hover,
-nav button:focus {
-  background: #00b4d8;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,180,216,0.7);
-  outline: none;
-  transform: scale(1.05);
+.nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
+
+/* Small screens: show hamburger menu */
+@media (max-width: 700px) {
+  .nav-header {
+    display: block;
+  }
+
+  .nav-buttons {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    background: #023e8a;
+  }
+
+  .nav-buttons.active {
+    display: flex;
+  }
+
+  nav button {
+    width: 100%;
+    border-radius: 0;
+    font-size: 1.1rem;
+    padding: 14px 0;
+  }
+}
+
 
 /* Main container */
 main {
@@ -368,14 +379,20 @@ input:focus, select:focus {
 </header>
 
 <nav>
-  <button onclick="showSection('home')">Home</button>
-  <button onclick="showSection('products')">Products</button>
-  <button onclick="showSection('productDetail')">Product Detail</button>
-  <button onclick="showSection('cart')">Cart</button>
-  <button onclick="showSection('checkout')">Checkout</button>
-  <button onclick="showSection('login')">Login/Register</button>
-  <button onclick="showSection('admin')">Admin Panel</button>
+  <div class="nav-header">
+    <span class="hamburger" onclick="toggleMenu()">☰</span>
+  </div>
+  <div id="nav-buttons" class="nav-buttons">
+    <button onclick="navigate('home')">Home</button>
+    <button onclick="navigate('products')">Products</button>
+    <button onclick="navigate('productDetail')">Product Detail</button>
+    <button onclick="navigate('cart')">Cart</button>
+    <button onclick="navigate('checkout')">Checkout</button>
+    <button onclick="navigate('login')">Login/Register</button>
+    <button onclick="navigate('admin')">Admin Panel</button>
+  </div>
 </nav>
+
 
 <main>
   <!-- Home Section -->
@@ -468,6 +485,21 @@ input:focus, select:focus {
 </main>
 
 <script>
+
+  function toggleMenu() {
+  const nav = document.getElementById('nav-buttons');
+  nav.classList.toggle('active');
+}
+
+function navigate(sectionId) {
+  showSection(sectionId);
+  // Hide menu on mobile after selection
+  const nav = document.getElementById('nav-buttons');
+  if (window.innerWidth <= 700) {
+    nav.classList.remove('active');
+  }
+}
+
   // Sample product data simulating backend JSON
   const productsDB = [
     { id: 1, category: 'Footwear', name: 'Bata Running Shoes', price: 59.99, description: 'Comfortable running shoes by Bata.' },
